@@ -1,7 +1,7 @@
 // コマンドのファイルをインポート
-import ping from "./time";
+import timeNotificaiton from "./time";
 
 // まとめてエクスポート
 export default [
-  ping,
+  timeNotificaiton,
 ]
