@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 
 // 先頭文字は別ファイル
-const prefix = "!";
+const prefix = require('../config/config.json').prefix;
 
 // 使用するイベント名
 const event = 'messageCreate';
