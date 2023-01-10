@@ -8,8 +8,9 @@ const event = 'messageCreate';
 
 // 処理の内容
 const handler = async (message: Message) => {
-  if (message.content === `${prefix}ping`) {
-      message.channel.send('pong!');
+  if(message.content ===`${prefix}time`){
+    const date1 = new Date();
+    message.channel.send(date1.toLocaleString());
   }
 };
 
