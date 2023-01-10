@@ -1,5 +1,5 @@
 // コマンドのファイルをインポート
-import ping from "./ping";
+import ping from "./time";
 
 // まとめてエクスポート
 export default [
