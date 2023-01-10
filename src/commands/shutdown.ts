@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 const prefix = require('../config/config.json').prefix;
 
-const aaa = 'messageCreate';
+const event = 'messageCreate';
 
 const handler = async(message: Message) => {
   if(message.content === `${prefix}shutdown`){
@@ -11,4 +11,4 @@ const handler = async(message: Message) => {
   }
 }
 
-export default {aaa,handler};
+export default {event,handler};
