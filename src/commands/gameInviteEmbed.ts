@@ -6,7 +6,8 @@ const prefix = require('../config/config.json').prefix;
 const emoji = require('node-emoji');
 
 const fs = require('fs');
-const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname,"../config/gametitle.json"), 'utf8'));   //こいつだけ相対パス
+const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname,"../config/gametitle.json"), 'utf8')); 
+//const jsonData = JSON.parse(fs.readFileSync("../config/gametitle.json", 'utf8')); 
 
 const event = 'messageCreate';
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
@@ -74,7 +75,7 @@ const handler = async(message: Message) => {
             .setColor(0x0099ff)
             .setTitle(gameTitle + '@' + num)
             .setAuthor({
-                name: `${message.member!.displayName}`,  //displayNameだとnicknameも考慮してくれる
+                name: `${message.member?.displayName}`,  //displayNameだとnicknameも考慮してくれる
                 iconURL: message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png',
             })
             .setDescription(commentString)
