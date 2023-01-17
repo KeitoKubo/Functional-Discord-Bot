@@ -6,7 +6,7 @@ const prefix = require('../config/config.json').prefix;
 const emoji = require('node-emoji');
 
 const fs = require('fs');
-const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname,"./config/gametitle.json"), 'utf8'));   //こいつだけ相対パス
+const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname,"../config/gametitle.json"), 'utf8'));   //こいつだけ相対パス
 
 const event = 'messageCreate';
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
@@ -15,7 +15,7 @@ const handler = async(message: Message) => {
     if(message.author.bot) return;
 
     if(cmdRegex.test(message.content)){    //+をつけると空白が入ると falseを返す
-        const embeds = await embedTemplate(message.content)
+        const embeds = await embedTemplate(message.content);
         if(embeds != null){
                 message.channel.send(embeds)
                 .then(sentMessage => { 
@@ -36,6 +36,7 @@ const handler = async(message: Message) => {
         if(jsonData[title] != undefined){
             return jsonData[title];
         }else{
+            message.channel.send("そのゲームは登録されていません");
             return null;
         }
     }
@@ -48,7 +49,9 @@ const handler = async(message: Message) => {
         let num = Number(numText[0]);
         const commentString = numText.slice(1).join(" ");     //ここは強制的に全角スペースとかを半角スペースに変える
         
-        
+        console.log(gameTitle);
+        console.log(num);
+        console.log(commentString);
         
         //画像urlの貼り付け
         const imageURL = await titleCheck(gameTitle);
@@ -67,7 +70,7 @@ const handler = async(message: Message) => {
         console.log(`r1:${arrayString[0]}\nr2:${arrayString[1]}\nr3:${commentString}`);
 
         //送信するembed
-        const template = new Discord.MessageEmbed()
+        const template = new Discord.EmbedBuilder()
             .setColor(0x0099ff)
             .setTitle(gameTitle + '@' + num)
             .setAuthor({
