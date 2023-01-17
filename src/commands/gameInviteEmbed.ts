@@ -1,13 +1,14 @@
 import { Message } from "discord.js";
+import path from "path";
 
 const Discord = require('discord.js');
 const prefix = require('../config/config.json').prefix;
 const emoji = require('node-emoji');
 
 const fs = require('fs');
-const jsonData = JSON.parse(fs.readFileSync("./config/gametitle.json", 'utf8'));   //こいつだけ相対パス
+const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname,"./config/gametitle.json"), 'utf8'));   //こいつだけ相対パス
 
-const event_1 = 'messageCreate';
+const event = 'messageCreate';
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
 
 const handler = async(message: Message) => {
@@ -84,4 +85,4 @@ const handler = async(message: Message) => {
 
 };
 
-export default{event_1, handler};
+export default{event, handler};
