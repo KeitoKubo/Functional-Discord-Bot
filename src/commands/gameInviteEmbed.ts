@@ -83,18 +83,19 @@ const handler = async(message: Message) => {
     if(message.author.bot) { return }
     if(!cmdRegex.test(message.content)) { return }
 
+    // embed取得
     const embeds = await embedTemplate(message);
-    if(embeds != null){
-            message.channel.send(embeds)
-            .then(sentMessage => { 
-                sentMessage.react(emoji.get('o'));      //送ったメッセージにリアクションをつける
-            });
-        
-    }else{
+    
+    if(embeds == null) {
         console.log('embeds else:' + message.content)
         message.channel.send(`コマンドを正しく入力してください 例:valo@4 範囲:1~20人`);
+        return;
     }
 
+    message.channel.send(embeds)
+    .then(sentMessage => { 
+        sentMessage.react(emoji.get('o'));      //送ったメッセージにリアクションをつける
+    });
 };
 
 export default { event, handler };
