@@ -17,22 +17,19 @@ const event = 'messageCreate';
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
 
 const handler = async(message: Message) => {
-    if(message.author.bot) return;
+    if(message.author.bot) { return }
+    if(!cmdRegex.test(message.content)) { return }
 
-    if(cmdRegex.test(message.content)){    //+をつけると空白が入ると falseを返す
-        const embeds = await embedTemplate(message.content);
-        if(embeds != null){
-                message.channel.send(embeds)
-                .then(sentMessage => { 
-                    sentMessage.react(emoji.get('o'));      //送ったメッセージにリアクションをつける
-                });
-            
-        }else{
-            console.log('embeds else:' + message.content)
-            message.channel.send(`コマンドを正しく入力してください 例:valo@4 範囲:1~20人`);
-        }
+    const embeds = await embedTemplate(message.content);
+    if(embeds != null){
+            message.channel.send(embeds)
+            .then(sentMessage => { 
+                sentMessage.react(emoji.get('o'));      //送ったメッセージにリアクションをつける
+            });
+        
     }else{
-        console.log('cmdRegex else:' + message.content);
+        console.log('embeds else:' + message.content)
+        message.channel.send(`コマンドを正しく入力してください 例:valo@4 範囲:1~20人`);
     }
     
 
