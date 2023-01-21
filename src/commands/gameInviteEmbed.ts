@@ -11,7 +11,7 @@ interface GameTitle {
 }
 
 const prefix = config.prefix;
-const gametitle: GameTitle = gametitleJson;
+const gameTitle: GameTitle = gametitleJson;
 
 const event = 'messageCreate';
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
@@ -35,15 +35,33 @@ const handler = async(message: Message) => {
 
     //タイトル名を確認します
     function titleCheck(title: string){
-        if(title in gametitle){
-            return gametitle[title];
+        if(title in gameTitle){
+            return gameTitle[title];
         }else{
             message.channel.send("そのゲームは登録されていません");
             return null;
         }
     }
 
+    const divParts = (text: string) => {
+        text = text.slice(1);        //!を削除
+
+        const [_title, _num] = text.split('@', 2);  // title @ num で分ける
+
+        const charlen = _title.length + _num.length + 1;    // 説明の部分を取り出すときに使う
+        const comment = text.substring(charlen);
+
+        return {
+            title: _title as string,
+            num: Number(_num),
+            comment: comment
+        };
+    }
+
     async function embedTemplate(messageContent: string){
+
+        // const {title, num, comment} = divParts(messageContent);
+        
         const arrayString = messageContent.split('@');       //空白文字のゲームが判断できない     !league of legends@4 hogehoge
         const gameTitle = arrayString[0].slice(1);        //!を削除
 
