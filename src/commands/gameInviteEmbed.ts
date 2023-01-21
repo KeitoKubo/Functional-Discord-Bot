@@ -1,13 +1,17 @@
+// importで揃えるとTypeScriptが使いやすくなる
 import { Message } from "discord.js";
-import path from "path";
+import config from "./../config/config.json";
+import gametitleJson from "./../config/gametitle.json";
+import Discord from "discord.js";
+import emoji from "node-emoji";
 
-const Discord = require('discord.js');
-const prefix = require('../config/config.json').prefix;
-const emoji = require('node-emoji');
+// gametitleの型 プロパティの値なんでも許容
+interface GameTitle {
+    [key: string] : string
+}
 
-const fs = require('fs');
-const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname,"../config/gametitle.json"), 'utf8')); 
-//const jsonData = JSON.parse(fs.readFileSync("../config/gametitle.json", 'utf8')); 
+const prefix = config.prefix;
+const gametitle: GameTitle = gametitleJson;
 
 const event = 'messageCreate';
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
@@ -34,8 +38,8 @@ const handler = async(message: Message) => {
 
     //タイトル名を確認します
     function titleCheck(title: string){
-        if(jsonData[title] != undefined){
-            return jsonData[title];
+        if(title in gametitle){
+            return gametitle[title];
         }else{
             message.channel.send("そのゲームは登録されていません");
             return null;
