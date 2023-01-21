@@ -59,9 +59,6 @@ const embedTemplate = async (message: Message) => {
         message.channel.send("そのゲームは登録されていません"); 
     }
 
-    const imageURL = titleExists ? gameTitle[title] : "";
-    console.log(imageURL);
-
     //送信するembed
     const template = new Discord.EmbedBuilder()
         .setColor(0x0099ff)
@@ -70,9 +67,9 @@ const embedTemplate = async (message: Message) => {
             name: `${message.member?.displayName}`,  //displayNameだとnicknameも考慮してくれる
             iconURL: message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png',
         })
-        .setDescription(comment.length > 0 ? comment : " ")    //  " "存在しない場合は空白にするように注意 nullだとInvalid Form Bodyが出る
+        .setDescription(comment.length > 0 ? comment : null)    //存在しない場合はnull
         .setThumbnail(message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png')
-        .setImage(imageURL)
+        .setImage(titleExists ? gameTitle[title] : null)
         .setTimestamp()
 
     return ({ embeds: [template] });
