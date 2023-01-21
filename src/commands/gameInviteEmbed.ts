@@ -16,6 +16,24 @@ const gameTitle: GameTitle = gametitleJson;
 const event = 'messageCreate';
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
 
+const cmdDiv = (text: string) => {
+    text = text.slice(1);        //!を削除
+
+    const [_title, _num] = text.split(/@|\s/, 2);  // title @ numで分ける \sでコメント部分を切り離す
+
+    console.log(_title)
+    console.log(_num)
+
+    const charlen = _title.length + _num.length + 2;    // 説明の部分を取り出すときに使う   @と空白文字を消すから +2
+    const comment = text.substring(charlen);
+
+    return {
+        title: _title as string,
+        num: Number(_num),
+        comment: comment
+    };
+}
+
 const handler = async(message: Message) => {
     if(message.author.bot) { return }
     if(!cmdRegex.test(message.content)) { return }
@@ -43,25 +61,9 @@ const handler = async(message: Message) => {
         }
     }
 
-    const divParts = (text: string) => {
-        text = text.slice(1);        //!を削除
-
-        const [_title, _num] = text.split('@', 2);  // title @ num で分ける
-
-        const charlen = _title.length + _num.length + 1;    // 説明の部分を取り出すときに使う
-        const comment = text.substring(charlen);
-
-        return {
-            title: _title as string,
-            num: Number(_num),
-            comment: comment
-        };
-    }
-
     async function embedTemplate(messageContent: string){
+        // const {title, num, comment} = cmdDiv(messageContent);
 
-        // const {title, num, comment} = divParts(messageContent);
-        
         const arrayString = messageContent.split('@');       //空白文字のゲームが判断できない     !league of legends@4 hogehoge
         const gameTitle = arrayString[0].slice(1);        //!を削除
 
@@ -108,4 +110,4 @@ const handler = async(message: Message) => {
 
 };
 
-export default{event, handler};
+export default { event, handler };
