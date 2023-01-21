@@ -1,6 +1,8 @@
 import { Message } from "discord.js";
-const prefix = require('../config/config.json').prefix;
-const emoji = require('node-emoji');
+import config from "../config/config.json";
+import emoji from "node-emoji";
+
+const prefix = config.prefix;
 
 const event = 'messageCreate';
 
