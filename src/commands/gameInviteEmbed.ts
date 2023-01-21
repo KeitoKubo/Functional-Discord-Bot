@@ -5,17 +5,14 @@ import gametitleJson from "./../config/gametitle.json";
 import Discord from "discord.js";
 import emoji from "node-emoji";
 
-// gametitleの型 プロパティの値なんでも許容
-interface GameTitle {
-    [key: string] : string
-}
-
 const prefix = config.prefix;
-const gameTitle: GameTitle = gametitleJson;
-
-const event = 'messageCreate';
+// Objectのプロパティなんでも許容
+const gameTitle: {[key: string] : string} = gametitleJson;
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
 
+const event = 'messageCreate';
+
+// コマンドを切り分ける
 const cmdDiv = (text: string) => {
     text = text.slice(1);        //!を削除
 
@@ -30,15 +27,63 @@ const cmdDiv = (text: string) => {
     return {
         title: _title as string,
         num: Number(_num),
-        comment: comment
+        comment: comment as string
     };
 }
 
+//タイトル名を確認します
+const titleCheck = (title: string) =>{
+    if(title in gameTitle){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+// 埋め込みテンプレ
+const embedTemplate = async (message: Message) => {
+    const {title, num, comment} = cmdDiv(message.content);
+
+    // console.log(title);
+    // console.log(num);
+    // console.log(comment);
+    console.log(`r1:${title}\nr2:${num}\nr3:${comment}`);
+
+    // チェックする
+    if(isNaN(num)) { return null; }
+    if(num < 1 && 20 < num) { return null; }
+    
+    //画像url確認
+    const titleExists = await titleCheck(title);
+    if(!titleExists){ 
+        message.channel.send("そのゲームは登録されていません"); 
+    }
+
+    const imageURL = titleExists ? gameTitle[title] : "";
+    console.log(imageURL);
+
+    //送信するembed
+    const template = new Discord.EmbedBuilder()
+        .setColor(0x0099ff)
+        .setTitle(title + '@' + num)
+        .setAuthor({
+            name: `${message.member?.displayName}`,  //displayNameだとnicknameも考慮してくれる
+            iconURL: message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png',
+        })
+        .setDescription(comment.length > 0 ? comment : " ")    //  " "存在しない場合は空白にするように注意 nullだとInvalid Form Bodyが出る
+        .setThumbnail(message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png')
+        .setImage(imageURL)
+        .setTimestamp()
+
+    return ({ embeds: [template] });
+}
+
+// handler
 const handler = async(message: Message) => {
     if(message.author.bot) { return }
     if(!cmdRegex.test(message.content)) { return }
 
-    const embeds = await embedTemplate(message.content);
+    const embeds = await embedTemplate(message);
     if(embeds != null){
             message.channel.send(embeds)
             .then(sentMessage => { 
@@ -48,64 +93,6 @@ const handler = async(message: Message) => {
     }else{
         console.log('embeds else:' + message.content)
         message.channel.send(`コマンドを正しく入力してください 例:valo@4 範囲:1~20人`);
-    }
-    
-
-    //タイトル名を確認します
-    function titleCheck(title: string){
-        if(title in gameTitle){
-            return gameTitle[title];
-        }else{
-            message.channel.send("そのゲームは登録されていません");
-            return null;
-        }
-    }
-
-    async function embedTemplate(messageContent: string){
-        // const {title, num, comment} = cmdDiv(messageContent);
-
-        const arrayString = messageContent.split('@');       //空白文字のゲームが判断できない     !league of legends@4 hogehoge
-        const gameTitle = arrayString[0].slice(1);        //!を削除
-
-        const numText = arrayString[1].split(/ | /);     //数字 と 説明取り出し
-        let num = Number(numText[0]);
-        const commentString = numText.slice(1).join(" ");     //ここは強制的に全角スペースとかを半角スペースに変える
-        
-        console.log(gameTitle);
-        console.log(num);
-        console.log(commentString);
-        
-        //画像urlの貼り付け
-        const imageURL = await titleCheck(gameTitle);
-        console.log(imageURL);
-
-        //numの確認 人数オーバーはエラー出す
-        if(!isNaN(num) && 1 <= num && num <= 20){
-            num = Number(num);
-        }else{
-            num = 0;
-            console.log(`r1:${gameTitle}\nr2:${num}\nr3:${commentString}`);
-            return null;
-        }
-
-        //check test
-        console.log(`r1:${arrayString[0]}\nr2:${arrayString[1]}\nr3:${commentString}`);
-
-        //送信するembed
-        const template = new Discord.EmbedBuilder()
-            .setColor(0x0099ff)
-            .setTitle(gameTitle + '@' + num)
-            .setAuthor({
-                name: `${message.member?.displayName}`,  //displayNameだとnicknameも考慮してくれる
-                iconURL: message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png',
-            })
-            .setDescription(commentString)
-            .setThumbnail(message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png')
-            .setImage(imageURL)
-            .setTimestamp()
-
-        return ({ embeds: [template] });
-
     }
 
 };
