@@ -5,7 +5,7 @@ import config from "./../config/config.json";
 
 const prefix = config.prefix;
 
-const event = 'messageCreate';
+const event: string = Events.MessageCreate;
 
 // embed例
 const embed = new EmbedBuilder()
@@ -20,10 +20,10 @@ const row = new ActionRowBuilder<ButtonBuilder>()
       .setCustomId("rock")
       .setLabel(`${emoji.get(":fist:")}グー`)
       .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId("scissors")
-        .setLabel(`${emoji.get(":crossed_fingers:")}チョキ`)
-        .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("scissors")
+      .setLabel(`${emoji.get(":crossed_fingers:")}チョキ`)
+      .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
       .setCustomId("paper")
       .setLabel(`${emoji.get(":raised_hand_with_fingers_splayed:")}パー`)

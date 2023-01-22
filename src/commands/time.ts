@@ -1,11 +1,11 @@
-import { Message } from "discord.js";
+import { Message, Events } from "discord.js";
 import config from "../config/config.json";
 
 // 先頭文字は別ファイル
 const prefix = config.prefix;
 
 // 使用するイベント名
-const event = 'messageCreate';
+const event: string = Events.MessageCreate;
 
 // 処理の内容
 const handler = async (message: Message) => {

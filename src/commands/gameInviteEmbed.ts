@@ -1,5 +1,5 @@
 // importで揃えるとTypeScriptが使いやすくなる
-import { Message } from "discord.js";
+import { Message, Events } from "discord.js";
 import config from "./../config/config.json";
 import gametitleJson from "./../config/gametitle.json";
 import Discord from "discord.js";
@@ -10,7 +10,7 @@ const prefix = config.prefix;
 const gameTitle: {[key: string] : string} = gametitleJson;
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
 
-const event = 'messageCreate';
+const event: string = Events.MessageCreate;
 
 // コマンドを切り分ける
 const cmdDiv = (text: string) => {
