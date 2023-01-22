@@ -9,8 +9,9 @@ const event: string = Events.InteractionCreate;
 
 const handler = (interaction: Interaction) => {
   if(!interaction.isButton()) { return }
+  if(!/^(rock|paper|scissors)$/.test(interaction.customId)) { return }
 
-	console.log(interaction);
+	console.log(interaction.customId);
 }
 
 export default { event, handler }
