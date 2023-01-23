@@ -25,7 +25,7 @@ const getResult = (userHand: number, botHand: number) => {
   if(userHand > botHand) {
     return 1;
   }else{
-    return 0;
+    return 2;
   }
 }
 
