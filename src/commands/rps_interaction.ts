@@ -40,8 +40,7 @@ const handler = async (interaction: Interaction) => {
   // 結果
   const result = getResult(userHand, botHand);
 
-
-  // // ボタンを押したユーザーに対して返信する
+  // ボタンを押したユーザーに対して返信する
   await interaction.reply(
     `You: ${emoji.get(rps_emoji[userHand])} vs Bot: ${emoji.get(rps_emoji[botHand])}` +
     "\n" +
