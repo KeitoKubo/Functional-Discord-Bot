@@ -42,8 +42,8 @@ const handler = async (interaction: Interaction) => {
 
   // ボタンを押したユーザーに対して返信する
   await interaction.reply(
-    `You: ${emoji.get(rps_emoji[userHand])} vs Bot: ${emoji.get(rps_emoji[botHand])}` +
-    "\n" +
+    `<@${interaction.user.id}>\n` +
+    `You: ${emoji.get(rps_emoji[userHand])} vs Bot: ${emoji.get(rps_emoji[botHand])}\n` +
     fixedPhrase[result]
   );
 
