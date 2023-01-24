@@ -1,92 +1,98 @@
-import { Message } from "discord.js";
-import path from "path";
+// importで揃えるとTypeScriptが使いやすくなる
+import { Message, Events } from "discord.js";
+import config from "./../config/config.json";
+import gametitleJson from "./../config/gametitle.json";
+import Discord from "discord.js";
+import emoji from "node-emoji";
 
-const Discord = require('discord.js');
-const prefix = require('../config/config.json').prefix;
-const emoji = require('node-emoji');
-
-const fs = require('fs');
-const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname,"../config/gametitle.json"), 'utf8')); 
-//const jsonData = JSON.parse(fs.readFileSync("../config/gametitle.json", 'utf8')); 
-
-const event = 'messageCreate';
+const prefix = config.prefix;
+// Objectのプロパティなんでも許容
+const gameTitle: {[key: string] : string} = gametitleJson;
 const cmdRegex = new RegExp("^" + prefix + ".*@[1-9]", 'i');
 
-const handler = async(message: Message) => {
-    if(message.author.bot) return;
+const event: string = Events.MessageCreate;
 
-    if(cmdRegex.test(message.content)){    //+をつけると空白が入ると falseを返す
-        const embeds = await embedTemplate(message.content);
-        if(embeds != null){
-                message.channel.send(embeds)
-                .then(sentMessage => { 
-                    sentMessage.react(emoji.get('o'));      //送ったメッセージにリアクションをつける
-                });
-            
-        }else{
-            console.log('embeds else:' + message.content)
-            message.channel.send(`コマンドを正しく入力してください 例:valo@4 範囲:1~20人`);
-        }
+// コマンドを切り分ける
+const cmdDiv = (text: string) => {
+    text = text.slice(1);        //!を削除
+
+    const [_title, _num] = text.split(/@|\s/, 2);  // title @ numで分ける \sでコメント部分を切り離す
+
+    console.log(_title)
+    console.log(_num)
+
+    const charlen = _title.length + _num.length + 2;    // 説明の部分を取り出すときに使う   @と空白文字を消すから +2
+    const comment = text.substring(charlen);
+
+    return {
+        title: _title as string,
+        num: Number(_num),
+        comment: comment as string
+    };
+}
+
+//タイトル名を確認します
+const titleCheck = (title: string) =>{
+    if(title in gameTitle){
+        return true;
     }else{
-        console.log('cmdRegex else:' + message.content);
+        return false;
     }
+}
+
+// 埋め込みテンプレ
+const embedTemplate = async (message: Message) => {
+    const {title, num, comment} = cmdDiv(message.content);
+
+    // console.log(title);
+    // console.log(num);
+    // console.log(comment);
+    console.log(`r1:${title}\nr2:${num}\nr3:${comment}`);
+
+    // チェックする
+    if(isNaN(num)) { return null; }
+    if(num < 1 && 20 < num) { return null; }
     
-
-    //タイトル名を確認します
-    function titleCheck(title: string){
-        if(jsonData[title] != undefined){
-            return jsonData[title];
-        }else{
-            message.channel.send("そのゲームは登録されていません");
-            return null;
-        }
+    //画像url確認
+    const titleExists = await titleCheck(title);
+    if(!titleExists){ 
+        message.channel.send("そのゲームは登録されていません"); 
     }
 
-    async function embedTemplate(messageContent: string){
-        const arrayString = messageContent.split('@');       //空白文字のゲームが判断できない     !league of legends@4 hogehoge
-        const gameTitle = arrayString[0].slice(1);        //!を削除
+    //送信するembed
+    const template = new Discord.EmbedBuilder()
+        .setColor(0x0099ff)
+        .setTitle(title + '@' + num)
+        .setAuthor({
+            name: `${message.member?.displayName}`,  //displayNameだとnicknameも考慮してくれる
+            iconURL: message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png',
+        })
+        .setDescription(comment.length > 0 ? comment : null)    //存在しない場合はnull
+        .setThumbnail(message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png')
+        .setImage(titleExists ? gameTitle[title] : null)
+        .setTimestamp()
 
-        const numText = arrayString[1].split(/ | /);     //数字 と 説明取り出し
-        let num = Number(numText[0]);
-        const commentString = numText.slice(1).join(" ");     //ここは強制的に全角スペースとかを半角スペースに変える
-        
-        console.log(gameTitle);
-        console.log(num);
-        console.log(commentString);
-        
-        //画像urlの貼り付け
-        const imageURL = await titleCheck(gameTitle);
-        console.log(imageURL);
+    return ({ embeds: [template] });
+}
 
-        //numの確認 人数オーバーはエラー出す
-        if(!isNaN(num) && 1 <= num && num <= 20){
-            num = Number(num);
-        }else{
-            num = 0;
-            console.log(`r1:${gameTitle}\nr2:${num}\nr3:${commentString}`);
-            return null;
-        }
+// handler
+const handler = async(message: Message) => {
+    if(message.author.bot) { return }
+    if(!cmdRegex.test(message.content)) { return }
 
-        //check test
-        console.log(`r1:${arrayString[0]}\nr2:${arrayString[1]}\nr3:${commentString}`);
-
-        //送信するembed
-        const template = new Discord.EmbedBuilder()
-            .setColor(0x0099ff)
-            .setTitle(gameTitle + '@' + num)
-            .setAuthor({
-                name: `${message.member?.displayName}`,  //displayNameだとnicknameも考慮してくれる
-                iconURL: message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png',
-            })
-            .setDescription(commentString)
-            .setThumbnail(message.author.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png')
-            .setImage(imageURL)
-            .setTimestamp()
-
-        return ({ embeds: [template] });
-
+    // embed取得
+    const embeds = await embedTemplate(message);
+    
+    if(embeds == null) {
+        console.log('embeds else:' + message.content)
+        message.channel.send(`コマンドを正しく入力してください 例:valo@4 範囲:1~20人`);
+        return;
     }
 
+    message.channel.send(embeds)
+    .then(sentMessage => { 
+        sentMessage.react(emoji.get('o'));      //送ったメッセージにリアクションをつける
+    });
 };
 
-export default{event, handler};
+export default { event, handler };
