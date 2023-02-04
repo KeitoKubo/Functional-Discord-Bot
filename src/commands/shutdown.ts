@@ -1,8 +1,10 @@
-import { Message } from "discord.js";
-const prefix = require('../config/config.json').prefix;
-const emoji = require('node-emoji');
+import { Message, Events } from "discord.js";
+import config from "../config/config.json";
+import emoji from "node-emoji";
 
-const event = 'messageCreate';
+const prefix = config.prefix;
+
+const event: string = Events.MessageCreate;
 
 const handler = async(message: Message) => {
   if(message.content === `${prefix}shutdown`){
