@@ -47,6 +47,7 @@ const handler = async (interaction: Interaction) => {
     fixedPhrase[result]
   );
 
+
   // console.log(interaction.customId);
 }
 
