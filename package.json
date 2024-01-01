@@ -30,6 +30,7 @@
     "@types/node-emoji": "^1.8.2",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
+    "mysql2": "^3.6.5",
     "node-emoji": "^1.11.0"
   }
 }
